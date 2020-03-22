@@ -1,4 +1,4 @@
-name: Build MT7621-1
+name: K2P
 
 on: 
   release:
@@ -8,15 +8,16 @@ on:
 #    - 'v*'
   #  branches: 
   #    - master
-  schedule:
-    - cron: 0 17 * * 4
-#  watch:
-   # types: [started]
+#  schedule:
+  #  - cron: 0 17 * * 4
+  watch:
+    types: [started]
 
 jobs:
   build:
     runs-on: ubuntu-18.04
-
+    if: github.event.repository.owner.id == github.event.sender.id
+    
     steps:
     - name: Checkout
       uses: actions/checkout@master
@@ -38,7 +39,7 @@ jobs:
         mkdir -p /opt/images/
     - name: Build Firmware
       env:
-        TNAME: "K2P-5.0 JCG-836PRO-5.0 JCG-AC860M-5.0 DIR-878-5.0 DIR-882-5.0 WR1200JS JCG-AC856M-5.0"
+        TNAME: "K2P-5.0"
       run: |
         cwd=`pwd`
         CONFIG_TOOLCHAIN_DIR=${cwd//\//\\\/}\\/toolchain-mipsel
@@ -75,27 +76,23 @@ jobs:
         echo "CONFIG_FIRMWARE_INCLUDE_SHADOWSOCKS=y" >> .config #SS plus+
         echo "CONFIG_FIRMWARE_INCLUDE_SSSERVER=n" >> .config #SS server
         echo "CONFIG_FIRMWARE_INCLUDE_DNSFORWARDER=n" >> .config #DNSFORWARDER
-        echo "CONFIG_FIRMWARE_INCLUDE_ADBYBY=y" >> .config #adbyby plus+
+        echo "CONFIG_FIRMWARE_INCLUDE_ADBYBY=n" >> .config #adbyby plus+
         echo "CONFIG_FIRMWARE_INCLUDE_FRPC=n" >> .config #内网穿透FRPC
         echo "CONFIG_FIRMWARE_INCLUDE_FRPS=n" >> .config #内网穿透FRPS
         echo "CONFIG_FIRMWARE_INCLUDE_TUNSAFE=n" >> .config #TUNSAFE
-        echo "CONFIG_FIRMWARE_INCLUDE_ALIDDNS=y" >> .config #阿里DDNS
-        echo "CONFIG_FIRMWARE_INCLUDE_SMARTDNS=y" >> .config
-        echo "CONFIG_FIRMWARE_INCLUDE_SMARTDNSBIN=y" >> .config #smartdns二进制文件
+        echo "CONFIG_FIRMWARE_INCLUDE_ALIDDNS=n" >> .config #阿里DDNS
+        echo "CONFIG_FIRMWARE_INCLUDE_SMARTDNS=n" >> .config
+        echo "CONFIG_FIRMWARE_INCLUDE_SMARTDNSBIN=n" >> .config #smartdns二进制文件
+        echo "CONFIG_FIRMWARE_INCLUDE_V2RAY=y" >> .config #v2ray二进制文件
         echo "CONFIG_FIRMWARE_INCLUDE_TROJAN=n" >> .config #集成trojan执行文件，如果不集成，会从网上下载下来执行，不影响正常使用
-        echo "CONFIG_FIRMWARE_INCLUDE_KOOLPROXY=y" >> .config #KP广告过滤
-        echo "CONFIG_FIRMWARE_INCLUDE_CADDY=y" >> .config #在线文件管理服务
+        echo "CONFIG_FIRMWARE_INCLUDE_KOOLPROXY=n" >> .config #KP广告过滤
+        echo "CONFIG_FIRMWARE_INCLUDE_CADDY=n" >> .config #在线文件管理服务
         echo "CONFIG_FIRMWARE_INCLUDE_CADDYBIN=n" >> .config #集成caddu执行文件，此文件有13M,请注意固件大小。如果不集成，会从网上下载下来执行，不影响正常使用
         echo "CONFIG_FIRMWARE_INCLUDE_KUMASOCKS=y" >> .config
         echo "CONFIG_FIRMWARE_INCLUDE_ADGUARDHOME=y" >> .config
         echo "CONFIG_FIRMWARE_INCLUDE_IPT2SOCKS=y" >> .config
         echo "CONFIG_FIRMWARE_INCLUDE_MICROSOCKS=y" >> .config
         echo "CONFIG_FIRMWARE_INCLUDE_SRELAY=n" >> .config
-        if [ "$m" = "K2P-5.0" ] || [ "$m" = "DIR-878-5.0" ]; then
-        echo "CONFIG_FIRMWARE_INCLUDE_V2RAY=y" >> .config #v2ray二进制文件
-        else
-        echo "CONFIG_FIRMWARE_INCLUDE_V2RAY=n" >> .config #v2ray二进制文件
-        fi
         ####################################################################################
         sed -i "s/^CONFIG_TOOLCHAIN_DIR=.*$/CONFIG_TOOLCHAIN_DIR=${CONFIG_TOOLCHAIN_DIR}/g" .config
         sudo ./clear_tree_simple
@@ -105,7 +102,7 @@ jobs:
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v1-release
       with:
-        repo_token: ${{ secrets.R_TOKEN }}
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: /opt/images/*.trx
         tag: AtuoBuild
         overwrite: true
@@ -116,4 +113,4 @@ jobs:
        tag: AtuoBuild
        allowUpdates: true
        name: Padavan-firmware
-       token: ${{ secrets.R_TOKEN }}
+       token: ${{ secrets.GITHUB_TOKEN }}
