@@ -6,15 +6,15 @@ sed -i '/no-resolv/d' /etc/storage/dnsmasq/dnsmasq.conf
 sed -i '/server=127.0.0.1/d' /etc/storage/dnsmasq/dnsmasq.conf
 cat >> /etc/storage/dnsmasq/dnsmasq.conf << EOF
 no-resolv
-server=127.0.0.1#5353
+server=127.0.0.1#5335
 EOF
 /sbin/restart_dhcpd
-logger -t "AdGuardHome" "添加DNS转发到5353端口"
+logger -t "AdGuardHome" "添加DNS转发到5335端口"
 fi
 }
 del_dns() {
 sed -i '/no-resolv/d' /etc/storage/dnsmasq/dnsmasq.conf
-sed -i '/server=127.0.0.1#5353/d' /etc/storage/dnsmasq/dnsmasq.conf
+sed -i '/server=127.0.0.1#5335/d' /etc/storage/dnsmasq/dnsmasq.conf
 /sbin/restart_dhcpd
 }
 
@@ -24,15 +24,15 @@ set_iptable()
 	IPS="`ifconfig | grep "inet addr" | grep -v ":127" | grep "Bcast" | awk '{print $2}' | awk -F : '{print $2}'`"
 	for IP in $IPS
 	do
-		iptables -t nat -A PREROUTING -p tcp -d $IP --dport 53 -j REDIRECT --to-ports 5353 >/dev/null 2>&1
-		iptables -t nat -A PREROUTING -p udp -d $IP --dport 53 -j REDIRECT --to-ports 5353>/dev/null 2>&1
+		iptables -t nat -A PREROUTING -p tcp -d $IP --dport 53 -j REDIRECT --to-ports 5335 >/dev/null 2>&1
+		iptables -t nat -A PREROUTING -p udp -d $IP --dport 53 -j REDIRECT --to-ports 5335>/dev/null 2>&1
 	done
 
 	IPS="`ifconfig | grep "inet6 addr" | grep -v " fe80::" | grep -v " ::1" | grep "Global" | awk '{print $3}'`"
 	for IP in $IPS
 	do
-		ip6tables -t nat -A PREROUTING -p tcp -d $IP --dport 53 -j REDIRECT --to-ports 5353 >/dev/null 2>&1
-		ip6tables -t nat -A PREROUTING -p udp -d $IP --dport 53 -j REDIRECT --to-ports 5353 >/dev/null 2>&1
+		ip6tables -t nat -A PREROUTING -p tcp -d $IP --dport 53 -j REDIRECT --to-ports 5335 >/dev/null 2>&1
+		ip6tables -t nat -A PREROUTING -p udp -d $IP --dport 53 -j REDIRECT --to-ports 5335 >/dev/null 2>&1
 	done
     logger -t "AdGuardHome" "重定向53端口"
     fi
@@ -40,7 +40,7 @@ set_iptable()
 
 clear_iptable()
 {
-	OLD_PORT="5353"
+	OLD_PORT="5335"
 	IPS="`ifconfig | grep "inet addr" | grep -v ":127" | grep "Bcast" | awk '{print $2}' | awk -F : '{print $2}'`"
 	for IP in $IPS
 	do
