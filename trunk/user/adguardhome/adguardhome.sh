@@ -6,7 +6,7 @@ sed -i '/no-resolv/d' /etc/storage/dnsmasq/dnsmasq.conf
 sed -i '/server=127.0.0.1/d' /etc/storage/dnsmasq/dnsmasq.conf
 cat >> /etc/storage/dnsmasq/dnsmasq.conf << EOF
 no-resolv
-server=127.0.0.1#53
+server=127.0.0.1#5353
 EOF
 /sbin/restart_dhcpd
 logger -t "AdGuardHome" "添加DNS转发到5353端口"
