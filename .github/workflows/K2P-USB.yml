@@ -105,7 +105,7 @@ jobs:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: /opt/images/*.trx
         tag: AtuoBuild
-        overwrite: false
+        overwrite: true
         file_glob: true
     - uses: ncipollo/release-action@v1
       with:
