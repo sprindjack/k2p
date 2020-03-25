@@ -1,6 +1,6 @@
 # 自己按需求改的固件 #
 啦啦啦啦
-
+## 因为SmartDNS和AdguarHome经常会死掉，弃用##
 
 ### 固件说明 ###
 * 集成/取消新增插件请修改此文件: trunk/build_firmware_modify
